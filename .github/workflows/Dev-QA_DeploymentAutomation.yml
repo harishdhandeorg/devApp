@@ -22,7 +22,8 @@ jobs:
 
       - name: Install QAENv
         run: |
-           npm i
+           npm init -y
+           npm install 
     
       - name: Conditional Statements to Check Smoke to Run
         if: "contains(github.event.head_commit.message, 'smoke')"
@@ -37,7 +38,7 @@ jobs:
             make test-run-regression
       
       - name: Conditional Statements to Check Sanity to Run
-        if: "contains(github.event.head_commit.message, 'regression')"
+        if: "contains(github.event.head_commit.message, 'sanity')"
         run: |
             echo "this is Sanity test execution"
             make test-run-sanity
