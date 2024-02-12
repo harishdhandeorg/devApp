@@ -1,0 +1,48 @@
+name: Dev Test Checker
+
+on:
+#triggers the workflow on push and pull request events for master
+  push:
+    branches:
+    - dev
+    
+#do running work flow from button
+  workflow_dispatch:
+
+jobs:
+  test-checker:
+    runs-on: windows-latest
+    if: "!contains(github.event.head_commit.message, 'SKIP SCRIPTS')"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: harishdhandeorg/demoApiAutomationrepo
+          ref: main
+          node-version: '18.x'
+          token: ${{secrets.MYTOKEN}}
+
+      - name: Install QAENv
+        run: |
+           npm install -g newman
+           npm install -g newman-reporter-slackmsg
+           npm install -g make
+           npm install -g dotenv
+    
+      - name: Conditional Statements to Check Smoke to Run
+        if: "contains(github.event.head_commit.message, 'smoke')"
+        run: |
+            echo "this is smoke test execution"
+            make newManrunner
+  
+      - name: Conditional Statements to Check Regression to Run
+        if: "contains(github.event.head_commit.message, 'regression')"
+        run: |
+            echo "this is Regression test execution"
+            make newManrunner
+            
+      # publish artifacts
+      - name: Publish Artifacts for Determined Setup
+        uses: actions/upload-artifact@v3
+        with: 
+          name: Reports
+          path: reportHtml
